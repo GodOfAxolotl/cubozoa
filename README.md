@@ -46,6 +46,9 @@ Cubozoa is a web application that allows users to edit, generate PDFs, and save 
 
 ## Installation (Linux)
 
+0. Install LaTeX
+    This is just a interface between Client and LaTeX, therefore a Latex Installation has to be provided on the host machine. I used the full TexLive package because I want to use the same Installation on all my devices (Desktop, Laptop, Mobile...) but anything should work as long as it offers PDFLatex functionality.
+
 1. Clone the repository:
 
    ```bash```
