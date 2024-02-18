@@ -1,6 +1,7 @@
 This is very, very work in progress! DO NOT HOST THIS PUBLICLY AND DO NOT USE YOUR GOOD PASSWORDS FOR LOGIN!!!
 
-# LaTeX Editor - Cubozoa
+LaTeX Editor - Cubozoa
+======================
 
 Cubozoa is a web application that allows users to edit, generate PDFs, and save LaTeX documents. This project is developed using Flask, Bootstrap, and other web technologies. It enables everyone to host latex without thinking about latex packages.
 
@@ -96,10 +97,12 @@ This project is licensed under the GNU General Public License. Feel free to use,
 ## History
 
 * v0.0.1
-  ** Can convert tex file to pdf and download it
-  ** Can download progress as txt
-  ** Can upload tex or txt file
+
+  * Can convert tex file to pdf and download it
+  * Can download progress as txt
+  * Can upload tex or txt file
 * v0.0.2
-  ** Can upload images, they are stored under /temp
-  ** very provisionally login and user functionality, now use for now but will later make image storing safer
+  
+  * Can upload images, they are stored under /temp
+  * very provisionally login and user functionality, now use for now but will later make image storing safer
   
