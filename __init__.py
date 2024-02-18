@@ -3,9 +3,10 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from user_db import UserDB
-from models import db
+from models import db, UploadedImages
 import tempfile
 import subprocess
+import hashlib
 import os
 import time
 import uuid
@@ -14,7 +15,7 @@ from werkzeug.utils import secure_filename
 
 ALLOWED_TEXT_EXTENSIONS = {'txt', 'tex'}
 ALLOWED_IMAGE_EXTENSIONS = {'png', 'jpeg'}
-MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16 MB
+MAX_CONTENT_LENGTH = 32 * 1024 * 1024  # 32 MB
 UPLOAD_FOLDER = 'temp'
 
 
@@ -53,7 +54,7 @@ def create_app():
     def is_valid_content(content):
         # TODO, check if file is potentially harmful
         return True 
-
+    
     def clean_temp_folder():
         if not os.path.exists(app.config['UPLOAD_FOLDER']):
             os.makedirs(app.config['UPLOAD_FOLDER'])
@@ -68,7 +69,7 @@ def create_app():
     @app.route('/')
     def index():
         clean_temp_folder() #TODO Not keep this as is omg
-        return render_template('index.html')
+        return render_template('index.html', user_db=user_db)
 
 
     @login_manager.user_loader
@@ -195,18 +196,35 @@ def create_app():
 
     @app.route('/upload_image', methods=['POST'])
     def upload_image():
-        if 'file' not in request.files or request.files['file'].filename == '':
-            return redirect(request.url)
+        if not current_user.is_authenticated:
+            return render_template('login.html', error_message='Login required to upload images')
 
-        file = request.files['file']
+        uploaded_file = request.files['file']
 
-        if file and allowed_image(file.filename):
-            filename = file.filename #str(uuid.uuid4()) + '.' + file.filename.rsplit('.', 1)[1].lower() TODO find solution for secure image upload
-            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(file_path)
-            return render_template('index.html', image_path=file_path)
+        if 'file' not in request.files or uploaded_file.filename == '':
+            return redirect(url_for('index'))
 
-        return redirect(request.url)
+        username = current_user.username
+        hashed_folder_name = current_user.userhash
+        user_folder = os.path.join('./instance', hashed_folder_name)
+
+        if not os.path.exists(user_folder):
+            os.makedirs(user_folder)
+
+        filename = secure_filename(uploaded_file.filename)
+        file_path = os.path.join(user_folder, filename)
+        if os.path.exists(file_path):
+            return render_template('index.html', error_message='This image has already been uploaded')
+
+        uploaded_file.save(file_path)
+
+        current_user.image_folder = hashed_folder_name
+        new_uploaded_image = UploadedImages(filename=filename, user=current_user)
+        db.session.add(new_uploaded_image)
+        db.session.commit()
+
+        return render_template('index.html', image_path=file_path, error_message='')
+
     
     return app
 

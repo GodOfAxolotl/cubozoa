@@ -163,11 +163,15 @@
         </div>
       </form>
 
-      {% if image_path %}
-      <div class="mt-3">
-        <img src="{{ image_path }}" class="img-fluid" alt="Uploaded Images" />
-      </div>
-      {% endif %}
+      <form id="imageForm" method="post">
+        <label for="imageSelect">Select Image:</label>
+        <select class="form-control" id="imageSelect" name="selectedImage">
+                <option value="e">e</option>
+        </select>
+    
+        <button type="button" class="btn btn-primary mt-2" onclick="insertImage('0000')">Insert Image</button>
+      </form>
+    
 
       <script>
         function submitForm(action) {
@@ -181,6 +185,14 @@
         function acceptCookies() {
         document.getElementById("cookie-banner").style.display = "none";
         }
+
+        function insertImage(hash) {
+            var selectedImage = document.getElementById("imageSelect").value;
+            var latexCodeTextarea = document.getElementById("latexCode");
+
+            var newLatexCode = "\\includegraphics{" + hash + selectedImage + "}";
+            latexCodeTextarea.value += newLatexCode;
+}
       </script>
 
       <script>
