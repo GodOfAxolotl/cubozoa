@@ -1,0 +1,11 @@
+body {
+    padding-top: 56px;
+}
+
+.navbar {
+    background-color: #343a40;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    color: #fff;
+}
