@@ -1,6 +1,9 @@
-from flask import Flask, render_template, request, send_file, redirect, url_for
-from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from flask import Flask, render_template, request, send_file, redirect, url_for, send_from_directory
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user, UserMixin
+from flask_sqlalchemy import SQLAlchemy
+from flask_bcrypt import Bcrypt
 from user_db import UserDB
+from models import db
 import tempfile
 import subprocess
 import os
@@ -22,9 +25,19 @@ def create_app():
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
     app.config['ALLOWED_TEXT_EXTENSIONS'] = ALLOWED_TEXT_EXTENSIONS
     app.config['ALLOWED_IMAGE_EXTENSIONS'] = ALLOWED_IMAGE_EXTENSIONS
+    app.config['SESSION_COOKIE_SECURE'] = True
+    app.config['SESSION_COOKIE_HTTPONLY'] = True
+    app.config['SESSION_COOKIE_SAMESITE'] = 'Lax' 
+    app.config['REMEMBER_COOKIE_SECURE'] = True
+    app.config['REMEMBER_COOKIE_HTTPONLY'] = True
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db' 
     app.config['SECRET_KEY'] = '8322c780ba9951754043be8980121e113b400b07549949087b5404a36490bff9'
 
     login_manager = LoginManager(app)
+    db.init_app(app)
+    with app.app_context():
+        db.create_all()
+
     user_db = UserDB()
 
 
@@ -57,6 +70,7 @@ def create_app():
         clean_temp_folder() #TODO Not keep this as is omg
         return render_template('index.html')
 
+
     @login_manager.user_loader
     def load_user(user_id):
         return user_db.get_user_by_id(int(user_id))
@@ -68,12 +82,20 @@ def create_app():
             password = request.form['password']
             user = user_db.get_user_by_username(username)
 
-            if user and password == user.password:
-                login_user(user)
-                return redirect(url_for('index'))
+            if user:
+                print(f"User found: {user.username}")
+                if user_db.check_password(username, password):
+                    print("Password is correct. Logging in.")
+                    login_user(user)
+                    return render_template('index.html')
+                else:
+                    print("Password is incorrect.")
+                    return render_template('login.html', error_message='Password is not correct')
             else:
-                return render_template('login.html', error_message='Credentials not correct')
-    
+                print("User not found.")
+
+            return render_template('login.html', error_message='Credentials not correct')
+
         return render_template('login.html')
 
     @app.route('/logout')
@@ -190,4 +212,5 @@ def create_app():
 
 if __name__ == '__main__':
     app = create_app()
+
     app.run(debug=True)

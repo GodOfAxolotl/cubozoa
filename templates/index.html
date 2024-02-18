@@ -7,6 +7,7 @@
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
     />
     <title>Cubozoa</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='cube_11.ico') }}">
 
     <!-- Bootstrap -->
     <link
@@ -59,15 +60,20 @@
       </div>
     </nav>
 
+    <div id="cookie-banner" class="alert alert-dismissible fade show">
+        This website uses cookies. By using our website, you agree to this.
+        <button  type="button" class="btn btn-success" onclick="acceptCookies()">Agree</button>
+    </div>
+
     <div class="container mt-4">
       {% if current_user.is_authenticated %}
       <p>
-        Willkommen, {{ current_user.username }}!
+        Welcome, {{ current_user.username }}!
         <a href="{{ url_for('logout') }}">Logout</a>
       </p>
       {% else %}
       <p>
-        Du bist nicht eingeloggt. <a href="{{ url_for('login') }}">Login</a>
+        You are not logged in. <a href="{{ url_for('login') }}">Login</a>
       </p>
       {% endif %}
 
@@ -170,6 +176,10 @@
               ? "{{ url_for('generate_pdf') }}"
               : "{{ url_for('save_as_txt') }}";
           document.getElementById("myForm").submit();
+        }
+
+        function acceptCookies() {
+        document.getElementById("cookie-banner").style.display = "none";
         }
       </script>
 

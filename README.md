@@ -61,11 +61,11 @@ Cubozoa is a web application that allows users to edit, generate PDFs, and save 
     ```pip install -r requirements.txt```
 
 3. Setup virtual environment
-    ```python -m venv venv```
+    ```python -m venv cubozoavenv```
 
    Activate the virtual environment:
 
-    ```source venv/bin/activate```
+    ```source cubozoavenv/bin/activate```
 
 4. Run the application with Gunicorn
 
