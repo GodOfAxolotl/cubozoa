@@ -3,11 +3,10 @@ Description=Gunicorn instance to serve cubezoa latex editor on web
 After=network.target
 
 [Service]
-User=cube
+User=admin
 Group=www-data
-WorkingDirectory=/home/cube/cubezoa
-Environment="PATH=/home/cube/cubezoa/cubezoaenv/bin"
-ExecStart=/home/cube/cubezoa/cubezoaenv/bin/gunicorn --workers 3 --bind 0.0.0.0:5000 "__init__:crate_app()"
-
+WorkingDirectory=/home/admin/cubozoa
+Environment="PATH=/home/admin/cubozoa/cubozoavenv/bin"
+ExecStart=/home/admin/cubozoa/cubozoavenv/bin/gunicorn --workers 4 --bind 192.168.178.52:5555 "__init__:create_app()"
 [Install]
 WantedBy=multi-user.target
