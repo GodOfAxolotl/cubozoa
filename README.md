@@ -7,10 +7,11 @@ Cubozoa is a web application that allows users to edit, generate PDFs, and save 
 ## Table of Contents
 
 - [Features](#features)
-- [Roadmap](#roadmap)
 - [Installation](#installation)
 - [Usage](#usage)
 - [License](#license)
+- [Roadmap](#roadmap)
+- [History](#history)
 
 ## Features
 
@@ -90,4 +91,15 @@ Cubozoa is a web application that allows users to edit, generate PDFs, and save 
 
 ## License
 
-This project is licensed under the MIT License. Feel free to use, modify, and distribute it for any purpose.
+This project is licensed under the GNU General Public License. Feel free to use, modify, and distribute it for any purpose, but keep it open source.
+
+## History
+
+* v0.0.1
+  ** Can convert tex file to pdf and download it
+  ** Can download progress as txt
+  ** Can upload tex or txt file
+* v0.0.2
+  ** Can upload images, they are stored under /temp
+  ** very provisionally login and user functionality, now use for now but will later make image storing safer
+  
