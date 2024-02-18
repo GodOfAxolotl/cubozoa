@@ -1,4 +1,6 @@
 from flask import Flask, render_template, request, send_file, redirect, url_for
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from user_db import UserDB
 import tempfile
 import subprocess
 import os
@@ -20,6 +22,11 @@ def create_app():
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
     app.config['ALLOWED_TEXT_EXTENSIONS'] = ALLOWED_TEXT_EXTENSIONS
     app.config['ALLOWED_IMAGE_EXTENSIONS'] = ALLOWED_IMAGE_EXTENSIONS
+    app.config['SECRET_KEY'] = '8322c780ba9951754043be8980121e113b400b07549949087b5404a36490bff9'
+
+    login_manager = LoginManager(app)
+    user_db = UserDB()
+
 
     def allowed_file(filename):
         return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_TEXT_EXTENSIONS
@@ -47,12 +54,45 @@ def create_app():
         clean_temp_folder() #TODO Not keep this as is omg
         return render_template('index.html')
 
-    @app.route('/login')
-    def login():
-        return render_template("login.html")
+    @login_manager.user_loader
+    def load_user(user_id):
+        return user_db.get_user_by_id(int(user_id))
 
-    @app.route('/registration')
+    @app.route('/login', methods=['GET', 'POST'])
+    def login():
+        if request.method == 'POST':
+            username = request.form['username']
+            password = request.form['password']
+            user = user_db.get_user_by_username(username)
+
+            if user and password == user.password:
+                login_user(user)
+                return redirect(url_for('index'))
+            else:
+                return render_template('login.html', error_message='Credentials not correct')
+    
+        return render_template('login.html')
+
+    @app.route('/logout')
+    def logout():
+        logout_user()
+        return render_template('index.html')
+
+    @app.route('/registration', methods=['GET', 'POST'])
     def registration():
+        if request.method == 'POST':
+            username = request.form['username']
+            email = request.form['email']
+            password = request.form['password']
+            
+            existing_user = user_db.get_user_by_username(username)
+            if existing_user:
+                return render_template('registration.html', error_message='Username not available')
+
+            new_user = user_db.add_user(username, email, password)
+            login_user(new_user)
+            return redirect(url_for('index'))
+
         return render_template("registration.html")
 
     @app.route('/guide')
