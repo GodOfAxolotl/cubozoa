@@ -105,4 +105,10 @@ This project is licensed under the GNU General Public License. Feel free to use,
   
   * Can upload images, they are stored under /temp
   * very provisionally login and user functionality, now use for now but will later make image storing safer
-  
+
+* v0.0.3
+  * Passwords are not stored in text anymore
+  * Database added
+  * User Login works reliable
+  * Image Insertion works unreliable
+  * Images are stored per user in their folder
