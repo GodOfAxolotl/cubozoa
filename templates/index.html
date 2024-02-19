@@ -56,7 +56,12 @@
             <a class="nav-link" href="{{ url_for('tools') }}">Tools</a>
           </li>
         </ul>
+        {% if current_user.is_authenticated %}
+        <a class="btn btn-light ml-2" href="{{ url_for('logout') }}">Logout</a>
+        {% else %}
         <a class="btn btn-light ml-2" href="{{ url_for('login') }}">Login</a>
+        {% endif %}
+
       </div>
     </nav>
 
@@ -130,7 +135,7 @@
           </div>
           <div class="input-group-append">
             <button class="btn btn-outline-primary mb-2" type="submit">
-              Clear
+              Clear Upload
             </button>
           </div>
         </div>
@@ -166,10 +171,12 @@
       <form id="imageForm" method="post">
         <label for="imageSelect">Select Image:</label>
         <select class="form-control" id="imageSelect" name="selectedImage">
-                <option value="e">e</option>
+          {% for image in uploaded_images %}
+            <option value="{{ image.id }}">{{ image.filename }}</option>
+          {% endfor %}
         </select>
     
-        <button type="button" class="btn btn-primary mt-2" onclick="insertImage('0000')">Insert Image</button>
+        <button type="button" class="btn btn-primary mt-2" onclick="insertImage('{{ current_user.userhash }}')">Insert Image</button>
       </form>
     
 
@@ -187,12 +194,19 @@
         }
 
         function insertImage(hash) {
-            var selectedImage = document.getElementById("imageSelect").value;
-            var latexCodeTextarea = document.getElementById("latexCode");
+          var selectElement = document.getElementById("imageSelect");
+        var selectedOption = selectElement.options[selectElement.selectedIndex];
+        var filename = selectedOption.text;
 
-            var newLatexCode = "\\includegraphics{" + hash + selectedImage + "}";
-            latexCodeTextarea.value += newLatexCode;
-}
+        var latexCodeTextarea = document.getElementById("latexCode");
+        var newLatexCode = "\\includegraphics{./instance/" + hash + "/" + filename + "}";
+
+        console.log("Selected Image:", selectedOption.value);
+        console.log("Filename:", filename);
+        console.log("New LaTeX Code:", newLatexCode);
+        
+        latexCodeTextarea.value += newLatexCode;
+            }
       </script>
 
       <script>

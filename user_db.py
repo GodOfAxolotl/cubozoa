@@ -19,10 +19,15 @@ class UserDB:
     def check_password(self, username, password):
         user = self.get_user_by_username(username)
         return user and user.check_password(password)
+    
+
 
     def get_uploaded_images(self, user):
+        print("Trying to get images")
         if user.is_authenticated:
             user_instance = User.query.get(user.id)
+            print(user_instance)
             return user_instance.uploaded_images
         else:
+            print("No Authentication")
             return []

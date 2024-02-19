@@ -69,7 +69,8 @@ def create_app():
     @app.route('/')
     def index():
         clean_temp_folder() #TODO Not keep this as is omg
-        return render_template('index.html', user_db=user_db)
+        uploaded_images = user_db.get_uploaded_images(current_user)
+        return render_template('index.html', user_db=user_db, uploaded_images=uploaded_images)
 
 
     @login_manager.user_loader
@@ -88,7 +89,8 @@ def create_app():
                 if user_db.check_password(username, password):
                     print("Password is correct. Logging in.")
                     login_user(user)
-                    return render_template('index.html')
+                    uploaded_images = user_db.get_uploaded_images(current_user)
+                    return render_template('index.html', uploaded_images=uploaded_images)
                 else:
                     print("Password is incorrect.")
                     return render_template('login.html', error_message='Password is not correct')
@@ -222,8 +224,8 @@ def create_app():
         new_uploaded_image = UploadedImages(filename=filename, user=current_user)
         db.session.add(new_uploaded_image)
         db.session.commit()
-
-        return render_template('index.html', image_path=file_path, error_message='')
+        uploaded_images = user_db.get_uploaded_images(current_user)
+        return render_template('index.html', image_path=file_path, error_message='', uploaded_images=uploaded_images) 
 
     
     return app
