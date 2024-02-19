@@ -154,6 +154,15 @@ def create_app():
     @app.route('/generate_pdf', methods=['POST'])
     def generate_pdf():
         latex_code = request.form['latexCode']
+        user_hash = current_user.userhash
+
+        if current_user.is_authenticated:
+            output_directory = f'./instance/out/{user_hash}'
+        else:
+            output_directory = './static/out'
+
+        if not os.path.exists(output_directory):
+            os.makedirs(output_directory)
 
         with tempfile.NamedTemporaryFile(mode='w+', suffix='.tex', delete=False) as temp_file:
             temp_filename = temp_file.name
@@ -162,18 +171,17 @@ def create_app():
 
             # LaTeX to PDF conversion
             try:
-                subprocess.run(['pdflatex', '-output-directory=./static/out', '-jobname=output', '-interaction=nonstopmode', '-halt-on-error', temp_filename], check=True)
+                subprocess.run(['pdflatex', f'-output-directory={output_directory}', '-jobname=output', '-interaction=nonstopmode', '-halt-on-error', temp_filename], check=True)
             except subprocess.CalledProcessError as e:
                 # Falsche Syntax
-                error_message = f"An error has occured while executing pdflatex: {e} \n Please review your file syntax"
+                error_message = f"An error has occurred while executing pdflatex: {e} \n Please review your file syntax"
                 return render_template('index.html', error_message=error_message)
 
-        pdf_filename = './static/out/output.pdf'
-
-        os.rename('./static/out/output.pdf', pdf_filename)
+        pdf_filename = f'{output_directory}/output.pdf'
+        os.rename(f'{output_directory}/output.pdf', pdf_filename)
         os.unlink(temp_filename)
 
-        return send_file(pdf_filename, as_attachment=True)
+        return send_file(pdf_filename, as_attachment=True, download_name='output.pdf')
 
 
     @app.route('/save_as_txt', methods=['POST'])
